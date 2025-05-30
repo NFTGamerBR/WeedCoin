@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Idle Weed Clicker</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: white;
+      font-size: 1.2rem;
+    }
+    .btn-lg {
+      padding: 1.5rem;
+      font-size: 1.2rem;
+    }
+    .error-msg {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="container py-4">
+  <!-- LOGIN METAMASK -->
+  <div class="text-center mb-4" id="walletSection">
+    <button id="connectWallet" class="btn btn-warning w-100">Conectar com MetaMask</button>
+    <p id="walletAddress" class="text-white mt-2"></p>
+  </div>
+
+  <!-- MENSAGEM DE ERRO -->
+  <div id="errorMessage" class="text-center error-msg mb-2"></div>
+
+  <!-- TÍTULO -->
+  <div class="text-center mb-4">
+    <h1 class="bg-success p-2 rounded">Idle Weed Clicker</h1>
+  </div>
+
+  <!-- VALORES PRINCIPAIS -->
+  <div class="row text-center mb-3">
+    <div class="col-6">Maconha: <span id="weed">0</span></div>
+    <div class="col-6">Dinheiro: <span id="cash">0</span></div>
+  </div>
+  <div class="row text-center mb-3">
+    <div class="col-6">Por Clique: <span id="weedpc">1</span></div>
+    <div class="col-6">Por Segundo: <span id="weedps">0</span></div>
+  </div>
+  <div class="row text-center mb-4">
+    <div class="col-6">Venda/Clique: <span id="cashPerClick">10</span></div>
+    <div class="col-6">Valor da Grama: <span id="weedVal">10</span></div>
+  </div>
+
+  <!-- BOTÕES PRINCIPAIS -->
+  <div class="d-grid gap-3 mb-4">
+    <button class="btn btn-success btn-lg" onclick="ClickWeed()">Clique para Cultivar!</button>
+    <button class="btn btn-primary btn-lg" onclick="ClickCash()">Clique para Vender!</button>
+  </div>
+
+  <!-- UPGRADES -->
+  <div class="mb-3">
+    <h5>Lojas de Upgrade</h5>
+    <button class="btn btn-outline-success w-100 mb-2" onclick="ClickUpg()">
+      Upgrade Luzes (+1 por clique) - Custo: <span id="weedUpgCost">500</span>
+    </button>
+    <button class="btn btn-outline-info w-100 mb-2" onclick="CashUpg()">
+      Aumentar Venda (+1 unidade por clique) - Custo: <span id="sellUpgCost">750</span>
+    </button>
+    <button class="btn btn-outline-warning w-100 mb-2" onclick="ValueUpg()">
+      Aumentar Potência (+10% valor da grama) - Custo: <span id="valUpgCost">1500</span>
+    </button>
+    <button class="btn btn-outline-light w-100" onclick="AutoGrow1Purchase()">
+      Contratar Jardineiro (+1 por segundo) - Custo: <span id="autoGrowCost">100</span>
+    </button>
+  </div>
+
+  <script>
+    let weed = 0;
+    let weedpc = 1;
+    let weedps = 0;
+    let cash = 0;
+    let weedcashval = 10;
+    let weedsoldpc = 1;
+    let weedupgcost = 500;
+    let sellupgcost = 750;
+    let valupgcost = 1500;
+    let autogrow1cost = 100;
+
+    function updateUI() {
+      document.getElementById("weed").innerText = Math.floor(weed);
+      document.getElementById("cash").innerText = Math.floor(cash);
+      document.getElementById("weedpc").innerText = weedpc;
+      document.getElementById("weedps").innerText = weedps;
+      document.getElementById("cashPerClick").innerText = Math.floor(weedsoldpc * weedcashval);
+      document.getElementById("weedVal").innerText = Math.floor(weedcashval);
+      document.getElementById("weedUpgCost").innerText = Math.floor(weedupgcost);
+      document.getElementById("sellUpgCost").innerText = Math.floor(sellupgcost);
+      document.getElementById("valUpgCost").innerText = Math.floor(valupgcost);
+      document.getElementById("autoGrowCost").innerText = Math.floor(autogrow1cost);
+    }
+
+    function showError(msg) {
+      document.getElementById("errorMessage").innerText = msg;
+      setTimeout(() => document.getElementById("errorMessage").innerText = "", 3000);
+    }
+
+    function ClickWeed() {
+      weed += weedpc;
+      updateUI();
+    }
+
+    function ClickCash() {
+      if (weed >= weedsoldpc) {
+        weed -= weedsoldpc;
+        cash += weedsoldpc * weedcashval;
+      } else {
+        showError("Você não tem maconha suficiente para vender.");
+      }
+      updateUI();
+    }
+
+    function ClickUpg() {
+      if (cash >= weedupgcost) {
+        weedpc += 1;
+        cash -= weedupgcost;
+        weedupgcost *= 1.7;
+      } else {
+        showError("Dinheiro insuficiente para esse upgrade.");
+      }
+      updateUI();
+    }
+
+    function CashUpg() {
+      if (cash >= sellupgcost) {
+        weedsoldpc += 1;
+        cash -= sellupgcost;
+        sellupgcost *= 1.7;
+      } else {
+        showError("Dinheiro insuficiente para esse upgrade.");
+      }
+      updateUI();
+    }
+
+    function ValueUpg() {
+      if (cash >= valupgcost) {
+        cash -= valupgcost;
+        weedcashval *= 1.10;
+        valupgcost *= 1.8;
+      } else {
+        showError("Dinheiro insuficiente para esse upgrade.");
+      }
+      updateUI();
+    }
+
+    function AutoGrow1Purchase() {
+      if (cash >= autogrow1cost) {
+        cash -= autogrow1cost;
+        weedps += 1;
+        autogrow1cost *= 1.5;
+      } else {
+        showError("Dinheiro insuficiente para contratar.");
+      }
+      updateUI();
+    }
+
+    // Auto incremento por segundo
+    setInterval(() => {
+      weed += weedps;
+      updateUI();
+    }, 1000);
+
+    // MetaMask Login
+    const connectBtn = document.getElementById("connectWallet");
+    const walletText = document.getElementById("walletAddress");
+
+    connectBtn.addEventListener("click", async () => {
+      if (typeof window.ethereum !== "undefined") {
+        try {
+          const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+          const wallet = accounts[0];
+          walletText.textContent = "Carteira: " + wallet;
+          connectBtn.style.display = "none";
+          localStorage.setItem("walletAddress", wallet);
+        } catch (err) {
+          walletText.textContent = "Erro ao conectar carteira.";
+          console.error(err);
+        }
+      } else {
+        walletText.textContent = "MetaMask não encontrada. Instale no seu navegador.";
+      }
+    });
+
+    window.addEventListener("load", () => {
+      const savedWallet = localStorage.getItem("walletAddress");
+      if (savedWallet) {
+        walletText.textContent = "Carteira: " + savedWallet;
+        connectBtn.style.display = "none";
+      }
+      updateUI();
+    });
+  </script>
+</body>
+</html>
